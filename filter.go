@@ -103,7 +103,10 @@ func DecompileFilter(packet *ber.Packet) (ret string, err error) {
 		case FilterSubstringsInitial:
 			ret += ber.DecodeString(packet.Children[1].Children[0].Data.Bytes()) + "*"
 		case FilterSubstringsAny:
-			ret += "*" + ber.DecodeString(packet.Children[1].Children[0].Data.Bytes()) + "*"
+			ret += "*"
+			for _, s := range packet.Children[1].Children {
+				ret += ber.DecodeString(s.Data.Bytes()) + "*"
+			}
 		case FilterSubstringsFinal:
 			ret += "*" + ber.DecodeString(packet.Children[1].Children[0].Data.Bytes())
 		}
