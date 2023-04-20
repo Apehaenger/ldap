@@ -108,7 +108,6 @@ func DecompileFilter(packet *ber.Packet) (ret string, err error) {
 					ret += "*"
 				}
 				ret += ber.DecodeString(child.Data.Bytes()) + "*"
-				//}
 			case FilterSubstringsFinal:
 				if ret[len(ret)-1:] != "*" {
 					ret += "*"
