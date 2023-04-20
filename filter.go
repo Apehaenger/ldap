@@ -99,16 +99,22 @@ func DecompileFilter(packet *ber.Packet) (ret string, err error) {
 	case FilterSubstrings:
 		ret += ber.DecodeString(packet.Children[0].Data.Bytes())
 		ret += "="
-		switch packet.Children[1].Children[0].Tag {
-		case FilterSubstringsInitial:
-			ret += ber.DecodeString(packet.Children[1].Children[0].Data.Bytes()) + "*"
-		case FilterSubstringsAny:
-			ret += "*"
-			for _, s := range packet.Children[1].Children {
-				ret += ber.DecodeString(s.Data.Bytes()) + "*"
+		for _, child := range packet.Children[1].Children {
+			switch child.Tag {
+			case FilterSubstringsInitial:
+				ret += ber.DecodeString(child.Data.Bytes()) + "*"
+			case FilterSubstringsAny:
+				if ret[len(ret)-1:] != "*" {
+					ret += "*"
+				}
+				ret += ber.DecodeString(child.Data.Bytes()) + "*"
+				//}
+			case FilterSubstringsFinal:
+				if ret[len(ret)-1:] != "*" {
+					ret += "*"
+				}
+				ret += ber.DecodeString(child.Data.Bytes())
 			}
-		case FilterSubstringsFinal:
-			ret += "*" + ber.DecodeString(packet.Children[1].Children[0].Data.Bytes())
 		}
 	case FilterEqualityMatch:
 		ret += ber.DecodeString(packet.Children[0].Data.Bytes())
